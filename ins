@@ -1,0 +1,157 @@
+## Substitution/Caesar Ciphers 
+def encrypt(text, s):
+    result = ""
+    for i in range(len(text)):
+        char = text[i]
+        if char.isupper():
+            result += chr((ord(char) + s - 65) % 26 + 65)
+        else:
+            result += chr((ord(char) + s - 97) % 26 + 97)
+    return result
+text = input("Enter the text to encrypt: ")
+s = 3
+print("Text: " + text)
+print("Cipher: " + encrypt(text, s))
+
+
+## Transposition/Railfence Ciphers (Java)
+public class RailFence {
+    public static void main(String args[]) {
+        String input = "Ismail T082";
+        String output = "";
+        int len = input.length();
+        System.out.println("Input String : " + input);
+        for (int i = 0; i < len; i += 2) {
+            output += input.charAt(i);
+        }      
+        for (int i = 1; i < len; i += 2) {
+            output += input.charAt(i);
+        }        
+        System.out.println("Ciphered Text : " + output);
+    }
+}
+
+
+## RSA Algo
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+import binascii
+
+keyPair = RSA.generate(1024)
+
+pubKey = keyPair.publickey()
+print(f"Public key: (n={hex(pubKey.n)}, e={hex(pubKey.e)})")
+pubKeyPEM = pubKey.exportKey()
+print(pubKeyPEM.decode('ascii'))
+
+print(f"Private key: (n={hex(pubKey.n)}, d={hex(keyPair.d)})")
+privKeyPEM = keyPair.exportKey()
+print(privKeyPEM.decode('ascii'))
+
+msg = b'Hidden Message'
+encryptor = PKCS1_OAEP.new(pubKey)
+encrypted = encryptor.encrypt(msg)
+print(f"Encrypted: {binascii.hexlify(encrypted)}")
+
+
+## MAC (MD5 Algorithm)
+import hashlib
+
+result = hashlib.md5(b'Ismail')
+result1 = hashlib.md5(b'Halai')
+
+print("The byte equivalent of hash is : ", end ="")
+print(result.digest())
+print("The byte equivalent of hash is : ", end ="")
+print(result1.digest())
+
+
+## MAC (SHA Algorithm)
+import hashlib
+str = input(" Enter the value to encode ")
+result = hashlib.sha1(str.encode())
+print("The hexadecima equivalent if SHA1 is : ")
+print(result.hexdigest())
+
+
+## Digital Signatures Algo (RSA-based)
+def euclid(m, n):
+    if n == 0:
+        return m
+    else:
+        r = m % n
+        return euclid(n, r)
+
+def exteuclid(a, b):
+    r1 = a
+    r2 = b
+    s1 = 1
+    s2 = 0
+    t1 = 0
+    t2 = 1
+    while r2 > 0:
+        q = r1 // r2
+        r = r1 - q * r2
+        r1 = r2
+        r2 = r
+        s = s1 - q * s2
+        s1 = s2
+        s2 = s
+        t = t1 - q * t2
+        t1 = t2
+        t2 = t
+    if t1 < 0:
+        t1 = t1 % a
+    return (r1, t1)
+
+p = 823
+q = 953
+n = p * q
+Pn = (p - 1) * (q - 1)
+
+key = []
+for i in range(2, Pn):
+    gcd = euclid(Pn, i)
+    if gcd == 1:
+        key.append(i)
+
+e = 313
+r, d = exteuclid(Pn, e)
+
+if r == 1:
+    d = int(d)
+    print("Decryption key is:", d)
+else:
+    print("Multiplicative inverse for the given encryption key does not exist. Choose a different encryption key.")
+
+M = 19070
+S = (M ** d) % n
+M1 = (S ** e) % n
+
+if M == M1:
+    print("As M = M1, Accept the message sent by Damon")
+else:
+    print("As M != M1, Do not accept the message sent by Damon")
+
+
+## Key Exchange using Diffie-Hellman
+if __name__ == '__main__':
+    P = 23
+    G = 9
+
+    print('The Value of P is : %d' % P)
+    print('The Value of G is : %d' % G)
+
+    a = 4
+    print('Secret Number for Alice is : %d' % a)
+    x = int(pow(G, a, P))
+
+    b = 6
+    print('Secret Number for Bob is : %d' % b)
+    y = int(pow(G, b, P))
+
+    ka = int(pow(y, a, P))
+    kb = int(pow(x, b, P))
+
+    print('Secret key for the Alice is : %d' % ka)
+    print('Secret Key for the Bob is : %d' % kb)
