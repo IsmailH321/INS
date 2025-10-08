@@ -159,3 +159,43 @@ if __name__ == '__main__':
 
     print('Secret key for the Alice is : %d' % ka)
     print('Secret Key for the Bob is : %d' % kb)
+
+
+## Web Security with SSL/TLS:
+## run on shell
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr -subj
+"/CN=localhost"
+openssl x509 -req -days 365 -in server.csr -signkey server.key
+-out server.crt
+## python http server
+import http.server
+import ssl
+
+HOST = 'localhost'
+PORT = 8443
+
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b"<h1>Secure Web Communication with Python!</h1>")
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain('server.crt', 'server.key')
+
+with http.server.HTTPServer((HOST, PORT), MyHandler) as httpd:
+    httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+    print(f"Serving HTTPS on port {PORT}")
+    httpd.serve_forever()
+## python client server
+import requests
+
+url = "https://localhost:8443"
+
+try:
+    response = requests.get(url, verify=False)
+    print(response.text)
+except requests.exceptions.SSLLError as e:
+    print(f"SSL Error: {e}")
